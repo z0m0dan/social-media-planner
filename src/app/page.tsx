@@ -1,6 +1,17 @@
 "use client";
-import { Flex, Grid, GridItem, Heading, Select } from "@chakra-ui/react";
+import {
+  Button,
+  Flex,
+  Grid,
+  GridItem,
+  Heading,
+  IconButton,
+  Select,
+  Tooltip,
+} from "@chakra-ui/react";
+import { AddIcon } from "@chakra-ui/icons";
 import { useEffect, useState } from "react";
+import AddEventContainer from "./_components/AddButton";
 
 type Event = {
   day: number;
@@ -11,7 +22,7 @@ type Event = {
 export default function Home() {
   const [selectedMonth, setSelectedMonth] = useState<number>(0);
   const [timestampEvents, setTimestapmEvents] = useState<Map<number, Event[]>>(
-    new Map(),
+    new Map()
   );
 
   const updateEvents = (events: Event[], day: number) =>
@@ -48,7 +59,7 @@ export default function Home() {
         <option value={10}>Noviembre</option>
         <option value={11}>Diciembre</option>
       </Select>
-      <Flex flexDir={"column"} height="80%" mx={4}>
+      <Flex flexDir={"column"} height="100%" mx={4}>
         <Grid templateColumns={"repeat(7, 1fr)"} gap={3} w={"100%"} mb={2}>
           <GridItem
             w={"100%"}
@@ -113,7 +124,13 @@ export default function Home() {
           </GridItem>
         </Grid>
 
-        <Grid templateColumns={"repeat(7, 1fr)"} gap={3} w={"100%"} h={"60%"}>
+        <Grid
+          templateRows={"repeat(5, 1fr)"}
+          templateColumns={"repeat(7, 1fr)"}
+          gap={3}
+          w={"100%"}
+          h={"80%"}
+        >
           {[...Array(offsetDays()).keys()].map((day) => (
             <GridItem
               w={"100%"}
@@ -133,6 +150,7 @@ export default function Home() {
               border={".5px solid"}
               borderRadius="5px"
               boxShadow={"md"}
+              overflowY={"auto"}
             >
               <Flex>{day + 1}</Flex>
               {timestampEvents.get(day + 1)?.length &&
@@ -141,6 +159,7 @@ export default function Home() {
           ))}
         </Grid>
       </Flex>
+      <AddEventContainer />
     </Flex>
   );
 }
