@@ -1,10 +1,10 @@
 import { z } from "zod";
 
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
-} from "@/server/api/trpc";
+import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
+
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 export const postRouter = createTRPCRouter({
   hello: publicProcedure
@@ -15,28 +15,20 @@ export const postRouter = createTRPCRouter({
       };
     }),
 
-  create: protectedProcedure
-    .input(z.object({ name: z.string().min(1) }))
-    .mutation(async ({ ctx, input }) => {
-      // simulate a slow db call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      return ctx.db.post.create({
-        data: {
-          name: input.name,
-          createdBy: { connect: { id: ctx.session.user.id } },
+  getMontlyPosts: publicProcedure
+    .input(z.object({ month: z.string() }))
+    .query(async ({ input }) => {
+      const posts = await prisma.post.findMany({
+        where: {
+          createdAt: {
+            gte: new Date(input.month),
+            lt: new Date(input.month),
+          },
         },
       });
+
+      return {
+        posts: posts,
+      };
     }),
-
-  getLatest: protectedProcedure.query(({ ctx }) => {
-    return ctx.db.post.findFirst({
-      orderBy: { createdAt: "desc" },
-      where: { createdBy: { id: ctx.session.user.id } },
-    });
-  }),
-
-  getSecretMessage: protectedProcedure.query(() => {
-    return "you can now see this secret message!";
-  }),
 });

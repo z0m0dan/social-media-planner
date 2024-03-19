@@ -12,9 +12,13 @@ import {
   ModalOverlay,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import type { Event } from "../page";
 
-const AddEventContainer = () => {
+type props = {
+  updateEvents: (events: Event[], day: number) => void;
+};
+
+const AddEventContainer: React.FC<props> = ({ updateEvents }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
@@ -44,9 +48,7 @@ const AddEventContainer = () => {
         <ModalContent>
           <ModalHeader>Modal Title</ModalHeader>
           <ModalCloseButton />
-          <ModalBody>
-            <p>Modal body text goes here.</p>
-          </ModalBody>
+          <ModalBody></ModalBody>
 
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={onClose}>
