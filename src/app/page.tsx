@@ -1,6 +1,6 @@
 "use client";
 import { Flex, Heading } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AddEventContainer from "./_components/AddButton";
 import { api } from "@/trpc/react";
 import Calendar from "./_components/Calendar";
@@ -22,15 +22,23 @@ export default function Home() {
     new Map(),
   );
 
-  const queryPosts = api.post.getMontlyPosts.useQuery({ month: "1" });
+  const queryPosts = api.post.getMontlyPosts.useQuery({
+    month: selectedMonth.toString(),
+  });
   const updateEvents = (events: Event[], day: number) =>
     setTimestapmEvents(new Map(timestampEvents.set(day, events)));
 
+  const refetch = () => {
+    queryPosts.refetch();
+  };
+  useEffect(() => {}, [selectedMonth]);
   if (queryPosts.isLoading) return <div>Loading...</div>;
 
   if (queryPosts.error) return <div>Error</div>;
 
   if (!queryPosts.data) return <div>No data</div>;
+
+  if (queryPosts.isRefetching) return <div>Refetching...</div>;
 
   return (
     <Flex flexDir={"column"} gap={4} w="100%" mb={4} h={"100vh"}>
@@ -40,7 +48,7 @@ export default function Home() {
         selectedMonth={selectedMonth}
         timestampEvents={queryPosts.data.posts}
       />
-      <AddEventContainer updateEvents={updateEvents} />
+      <AddEventContainer refetch={refetch} />
     </Flex>
   );
 }
